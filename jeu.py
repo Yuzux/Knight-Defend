@@ -1,255 +1,124 @@
+# Pygame template - skeleton for a new pygame project
 import pygame
+import random
 
-surfaceW = 800 #Dimension de la fenêtre / Largeur
-surfaceH = 600 #Dimension de la fenêtre / Longueur
- 
-class Menu :
-    """ Création et gestion des boutons d'un menu """
-    def __init__(self, application, *groupes) :
-        self.couleurs = dict(
-            normal=(0, 200, 0),
-            survol=(0, 200, 200),
-        )
-        font = pygame.font.SysFont('Helvetica', 24, bold=True)
-        # noms des menus et commandes associées
-        items = (
-            ('Start', application.quitter),
-            ('Control', application.jeu)
-        )
-        x = 400
-        y = 200
-        self._boutons = []
-        for texte, cmd in items :
-            mb = MenuBouton(
-                texte,
-                self.couleurs['normal'],
-                font,
-                x,
-                y,
-                200,
-                50,
-                cmd
-            )
-            self._boutons.append(mb)
-            y += 120
-            for groupe in groupes :
-                groupe.add(mb)
- 
-    def update(self, events) :
-        clicGauche, *_ = pygame.mouse.get_pressed()
-        posPointeur = pygame.mouse.get_pos()
-        for bouton in self._boutons :
-            # Si le pointeur souris est au-dessus d'un bouton
-            if bouton.rect.collidepoint(*posPointeur) :
-                # Changement du curseur par un quelconque
-                pygame.mouse.set_cursor(*pygame.cursors.tri_left)
-                # Changement de la couleur du bouton
-                bouton.dessiner(self.couleurs['survol'])
-                # Si le clic gauche a été pressé
-                if clicGauche :
-                    # Appel de la fonction du bouton
-                    bouton.executerCommande()
-                break
-            else :
-                # Le pointeur n'est pas au-dessus du bouton
-                bouton.dessiner(self.couleurs['normal'])
-        else :
-            # Le pointeur n'est pas au-dessus d'un des boutons
-            # initialisation au pointeur par défaut
-            pygame.mouse.set_cursor(*pygame.cursors.arrow)
- 
-    def detruire(self) :
-        pygame.mouse.set_cursor(*pygame.cursors.arrow) # initialisation du pointeur
- 
- 
- 
-class MenuBouton(pygame.sprite.Sprite) :
-    """ Création d'un simple bouton rectangulaire """
-    def __init__(self, texte, couleur, font, x, y, largeur, hauteur, commande) :
-        super().__init__()
-        self._commande = commande
- 
-        self.image = pygame.Surface((largeur, hauteur))
- 
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
- 
-        self.texte = font.render(texte, True, (0, 0, 0))
-        self.rectTexte = self.texte.get_rect()
-        self.rectTexte.center = (largeur/2, hauteur/2)
- 
-        self.dessiner(couleur)
- 
-    def dessiner(self, couleur) :
-        self.image.fill(couleur)
-        self.image.blit(self.texte, self.rectTexte)
- 
-    def executerCommande(self) :
-        # Appel de la commande du bouton
-        self._commande()
- 
- 
-class Jeu :
-    """ Simulacre de l'interface du jeu """
-    def __init__(self, jeu, *groupes) :
-        self._fenetre = jeu.fenetre
-        jeu.fond = (0, 0, 0)
- 
-        from itertools import cycle
-        couleurs = [(0, 48, i) for i in range(0, 256, 15)]
-        couleurs.extend(sorted(couleurs[1:-1], reverse=True))
-        self._couleurTexte = cycle(couleurs)
- 
-        self._font = pygame.font.SysFont('Helvetica', 36, bold=True)
-        self.creerTexte()
-        self.rectTexte = self.texte.get_rect()
-        self.rectTexte.center = (surfaceW/2, surfaceH/2)
-        # Création d'un event
-        self._CLIGNOTER = pygame.USEREVENT + 1
-        pygame.time.set_timer(self._CLIGNOTER, 80)
- 
-class Application :
-    """ Classe maîtresse gérant les différentes interfaces du jeu """
-    def __init__(self) :
-        pygame.init()
-        pygame.display.set_caption("ISN ILIES")
- 
-        self.fond = (150,)*3
- 
-        self.fenetre = pygame.display.set_mode((surfaceW,surfaceH))
-        # Groupe de sprites utilisé pour l'affichage
-        self.groupeGlobal = pygame.sprite.Group()
-        self.statut = True
- 
-    def _initialiser(self) :
-        try:
-            self.ecran.detruire()
-            # Suppression de tous les sprites du groupe
-            self.groupeGlobal.empty()
-        except AttributeError:
-            pass
- 
-    def menu(self) :
-        # Affichage du menu
-        self._initialiser()
-        self.ecran = Menu(self, self.groupeGlobal)
-     
-    def quitter(self) :
-        self.statut = False
-   
-    def jeu(self) :
-        # Affichage du jeu
-        self._initialiser()
-        self.ecran = Jeu(self, self.groupeGlobal)
- 
-    
-    def update(self) :
-        events = pygame.event.get()
- 
-        for event in events :
-            if event.type == pygame.QUIT :
-                self.quitter()
-                return
- 
-        self.fenetre.fill(self.fond)
-        self.ecran.update(events)
-        self.groupeGlobal.update()
-        self.groupeGlobal.draw(self.fenetre)
-        pygame.display.update()
- 
- 
-app = Application()
-app.menu()
- 
-clock = pygame.time.Clock()
- 
-while app.statut :
-    app.update()
-    clock.tick(30)
-
-pygame.quit()
-
-import pygame
-import time
-import threading
-
-successes, failures = pygame.init()
-print("Initializing pygame: {0} successes and {1} failures.".format(successes, failures))
-
-screen = pygame.display.set_mode((720, 480))
-clock = pygame.time.Clock()
+WIDTH = 360
+HEIGHT = 480
 FPS = 60
 
-BLACK = (0, 0, 0)
+# define colors
 WHITE = (255, 255, 255)
-RED = (255, 0 , 0)
+BLACK = (0, 0, 0)
+RED = (255, 0, 0)
+GREEN = (0, 255, 0)
+BLUE = (0, 0, 255)
+YELLOW = (255, 255, 0)
 
+# initialize pygame and create window
+pygame.init()
+pygame.mixer.init()
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+pygame.display.set_caption("Knight Defend")
+clock = pygame.time.Clock()
 
 class Player(pygame.sprite.Sprite):
     def __init__(self):
-        super().__init__()
-        self.image = pygame.image.load("lucina.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (50, 50))
-        self.rect = self.image.get_rect()  # Get rect of some size as 'image'.
-        self.velocity = [0, 0]
-
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((50, 40))
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.rect.centerx = WIDTH /2
+        self.rect.bottom = HEIGHT - 10
+        self.speedx = 0
+    
     def update(self):
-        self.rect.move_ip(*self.velocity)
+        self.speedx = 0
+        keystate = pygame.key.get_pressed()
+        if keystate[pygame.K_LEFT]:
+            self.speedx = -5
+        if keystate[pygame.K_RIGHT]:
+            self.speedx = 5
+        self.rect.x += self.speedx
+        if self.rect.right > WIDTH:
+            self.rect.right = WIDTH
+        if self.rect.left < 0:
+            self.rect.left = 0
+    
+    def shoot(self):
+        bullet = Bullet(self.rect.centerx, self.rect.top)
+        all_sprites.add(bullet)
+        bullets.add(bullet)
 
 class Ennemy(pygame.sprite.Sprite):
     def __init__(self):
-        super().__init__()
-        self.image = pygame.image.load("Slime.png").convert_alpha()
-        self.image = pygame.transform.scale(self.image, (50, 50))
-        self.rect = self.image.get_rect()  # Get rect of some size as 'image'.
-        self.velocity = [0, 0]
-        self.velocity[1] = 1
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((30, 40))
+        self.image.fill(RED)
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randrange(WIDTH - self.rect.width)
+        self.rect.y = random.randrange(-100, -40)
+        self.speedy = random.randrange(1, 8)
+        self.speedx = random.randrange(-3, 3)
 
     def update(self):
-        self.rect.move_ip(*self.velocity)
+        self.rect.x += self.speedx
+        self.rect.y += self.speedy
+        if self.rect.top > HEIGHT + 10 or self.rect.left < -25 or self.rect.right > WIDTH + 20:
+            self.rect.x = random.randrange(WIDTH - self.rect.width)
+            self.rect.y = random.randrange(-100, -40)
+            self.speedy = random.randrange(1, 5)
+            
+class Bullet(pygame.sprite.Sprite):
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((10, 20))
+        self.image.fill(YELLOW)
+        self.rect = self.image.get_rect()
+        self.rect.bottom = y
+        self.rect.centerx = x
+        self.speedy = -10
 
+    def update(self):
+        self.rect.y += self.speedy
+        # kill screen
+        if self.rect.bottom < 0:
+            self.kill()
 
-
+all_sprites = pygame.sprite.Group()
+ennemy = pygame.sprite.Group()
+bullets = pygame.sprite.Group()
 player = Player()
-ennemy = Ennemy()
-pygame.mixer.music.load("SAOFBmain.wav")
-volume = pygame.mixer.music.get_volume() #Retourne la valeur du volume, entre 0 et 1
-pygame.mixer.music.set_volume(1) #Met le volume à 0.5 (moitié)
-pygame.mixer.music.play()
+all_sprites.add(player)
+for i in range(5):
+    m = Ennemy()
+    all_sprites.add(m)
 
+# Game loop
 running = True
 while running:
-    dt = clock.tick(FPS) / 1000  # Returns milliseconds between each call to 'tick'. The convert time to seconds.
-    screen.fill(BLACK)  # Fill the screen with background color.    
-
+    # keep loop running at the right speed
+    clock.tick(FPS)
+    # Process input (events)
     for event in pygame.event.get():
+        # check for closing window
         if event.type == pygame.QUIT:
             running = False
         elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_w:
-                player.velocity[1] = -200 * dt  # 200 pixels per second
-            elif event.key == pygame.K_s:
-                player.velocity[1] = 200 * dt
-            elif event.key == pygame.K_a:
-                player.velocity[0] = -200 * dt
-            elif event.key == pygame.K_d:
-                player.velocity[0] = 200 * dt
-            elif event.key == pygame.K_SPACE:
-                print("TIR")
-                
+            if event.key == pygame.K_SPACE:
+                player.shoot()
 
-        elif event.type == pygame.KEYUP:
-            if event.key == pygame.K_w or event.key == pygame.K_s:
-                player.velocity[1] = 0
-            elif event.key == pygame.K_a or event.key == pygame.K_d:
-                player.velocity[0] = 0
-            
-    player.update()
-    ennemy.update()
+    # Update
+    all_sprites.update()
 
-    screen.blit(player.image, player.rect)
-    screen.blit(ennemy.image, ennemy.rect)
-    pygame.display.update()  # Or pygame.display.flip()
+    # check colision
+    hits = pygame.sprite.spritecollide(player, ennemy, False)
+    if hits:
+        running = False
 
-print("Exited the game loop. Game will quit...")
-quit()  # Not actually necessary since the script will exit anyway.
+    # Draw / render
+    screen.fill(BLACK)
+    all_sprites.draw(screen)
+    # *after* drawing everything, flip the display
+    pygame.display.flip()
+
+pygame.quit()
