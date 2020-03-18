@@ -92,6 +92,7 @@ all_sprites.add(player)
 for i in range(5):
     m = Ennemy()
     all_sprites.add(m)
+    ennemy.add(m)
 
 # Game loop
 running = True
@@ -109,6 +110,13 @@ while running:
 
     # Update
     all_sprites.update()
+
+    # check hit bullet mob
+    hits = pygame.sprite.groupcollide(ennemy, bullets, True, True)
+    for hit in hits:
+        m = Ennemy()
+        all_sprites.add(m)
+        ennemy.add(m)
 
     # check colision
     hits = pygame.sprite.spritecollide(player, ennemy, False)
