@@ -1,6 +1,9 @@
 # Pygame template - skeleton for a new pygame project
 import pygame
 import random
+from os import path
+
+img_dir = path.join(path.dirname(__file__), 'img')
 
 WIDTH = 360
 HEIGHT = 480
@@ -24,8 +27,8 @@ clock = pygame.time.Clock()
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((50, 40))
-        self.image.fill(GREEN)
+        self.image = pygame.transform.scale(player_img, (50, 38))
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.centerx = WIDTH /2
         self.rect.bottom = HEIGHT - 10
@@ -52,8 +55,8 @@ class Player(pygame.sprite.Sprite):
 class Ennemy(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((30, 40))
-        self.image.fill(RED)
+        self.image = pygame.transform.scale(ennemy_img, (60, 48))
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.x = random.randrange(WIDTH - self.rect.width)
         self.rect.y = random.randrange(-100, -40)
@@ -71,8 +74,8 @@ class Ennemy(pygame.sprite.Sprite):
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.Surface((10, 20))
-        self.image.fill(YELLOW)
+        self.image = bullet_img
+        self.image.set_colorkey(BLACK)
         self.rect = self.image.get_rect()
         self.rect.bottom = y
         self.rect.centerx = x
@@ -83,6 +86,12 @@ class Bullet(pygame.sprite.Sprite):
         # kill screen
         if self.rect.bottom < 0:
             self.kill()
+# graphic
+background = pygame.image.load(path.join(img_dir, "fond.png")).convert()
+background_rect = background.get_rect()
+player_img = pygame.image.load(path.join(img_dir, "player.png")).convert()
+ennemy_img = pygame.image.load(path.join(img_dir, "ennemy.png")).convert()
+bullet_img = pygame.image.load(path.join(img_dir, "laser.png")).convert()
 
 all_sprites = pygame.sprite.Group()
 ennemy = pygame.sprite.Group()
@@ -94,39 +103,41 @@ for i in range(5):
     all_sprites.add(m)
     ennemy.add(m)
 
-# Game loop
-running = True
-while running:
-    # keep loop running at the right speed
-    clock.tick(FPS)
-    # Process input (events)
-    for event in pygame.event.get():
-        # check for closing window
-        if event.type == pygame.QUIT:
+if __name__ == "__main__":
+    # Game loop
+    running = True
+    while running:
+        # keep loop running at the right speed
+        clock.tick(FPS)
+        # Process input (events)
+        for event in pygame.event.get():
+            # check for closing window
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    player.shoot()
+
+        # Update
+        all_sprites.update()
+
+        # check hit bullet mob
+        hits = pygame.sprite.groupcollide(ennemy, bullets, True, True)
+        for hit in hits:
+            m = Ennemy()
+            all_sprites.add(m)
+            ennemy.add(m)
+
+        # check colision
+        hits = pygame.sprite.spritecollide(player, ennemy, False)
+        if hits:
             running = False
-        elif event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_SPACE:
-                player.shoot()
 
-    # Update
-    all_sprites.update()
+        # Draw / render
+        screen.fill(BLACK)
+        screen.blit(background, background_rect)
+        all_sprites.draw(screen)
+        # *after* drawing everything, flip the display
+        pygame.display.flip()
 
-    # check hit bullet mob
-    hits = pygame.sprite.groupcollide(ennemy, bullets, True, True)
-    for hit in hits:
-        m = Ennemy()
-        all_sprites.add(m)
-        ennemy.add(m)
-
-    # check colision
-    hits = pygame.sprite.spritecollide(player, ennemy, False)
-    if hits:
-        running = False
-
-    # Draw / render
-    screen.fill(BLACK)
-    all_sprites.draw(screen)
-    # *after* drawing everything, flip the display
-    pygame.display.flip()
-
-pygame.quit()
+    pygame.quit()
