@@ -2,8 +2,6 @@
 import pygame
 import random
 from os import path
-
-import pygame
  
 surfaceW = 800 #Dimension de la fenêtre / Largeur
 surfaceH = 600 #Dimension de la fenêtre / Longueur
