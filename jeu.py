@@ -240,7 +240,7 @@ class Explosion(pygame.sprite.Sprite):
 def show_go_screen():
     screen.blit(background, background_rect)
     draw_text(screen, "Go to battle?!", 64, WIDTH / 2, HEIGHT / 10)
-    draw_text(screen, "Le but est de survivre en faisant le meilleur score !", 15, WIDTH / 2, HEIGHT / 4)
+    draw_text(screen, "Le but est de survivre en faisant le meilleur score !", 18, WIDTH / 2, HEIGHT / 4)
     draw_text(screen, "Fleche se deplacer, Espace pour Tirer", 22, WIDTH / 2, HEIGHT / 2)
     draw_text(screen, "Appuyer pour commencer", 18, WIDTH / 2, HEIGHT * 3 / 4)
     pygame.display.flip()
