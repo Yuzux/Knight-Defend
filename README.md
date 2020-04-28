@@ -6,6 +6,7 @@ Instalation de pygame :
     python -m pip install pygame
 
   Pour installer pygame sur Linux utiliser les commandes :
+    
     sudo apt-get install -y python3-pip
     sudo apt-get install -y \
       python3-numpy libav-tools libsdl-image1.2-dev \
